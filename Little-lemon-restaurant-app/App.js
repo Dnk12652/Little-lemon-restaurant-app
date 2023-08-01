@@ -41,12 +41,12 @@ export default function App() {
       <Stack.Navigator>
         {isOnboardingCompleted ? (
           // Onboarding completed, user is signed in
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
         ) : (
           // User is NOT signed in
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         )}
-        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

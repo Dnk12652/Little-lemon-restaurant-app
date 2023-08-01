@@ -21,8 +21,8 @@ const CustomButton = (props) => {
 const styles = StyleSheet.create({
   text: {
     color: "#ffffff",
-    fontSize: 20,
-    margin: 10,
+    fontSize: 18,
+    margin: 6,
     textAlign: "center",
   },
   button: {
