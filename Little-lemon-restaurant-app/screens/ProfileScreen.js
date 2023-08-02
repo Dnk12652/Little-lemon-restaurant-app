@@ -11,11 +11,13 @@ import {
   ScrollView,
 } from "react-native";
 
+
 import { validateEmail } from "../Utils/CommonFucntions";
 import { AuthContext } from "../Context/AuthContext";
 import Checkbox from "expo-checkbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import CustomButton from "../Utils/CustomButton";
 // import { useFonts } from "expo-font";
 // import * as SplashScreen from "expo-splash-screen";
 
@@ -130,6 +132,19 @@ const Profile = () => {
             </View>
           )}
           <View style={styles.avatarButtons}>
+            {/* <CustomButton
+              title={"Change"}
+              onPressFunction={pickImage}
+              color=""
+              type="outlined"
+            />
+            <CustomButton
+              title={"Remove"}
+              onPressFunction={() => update(profile)}
+              color="#495e57"
+              type="contained"
+              disabled={removeImage}
+            /> */}
             <Pressable
               style={styles.changeBtn}
               title="Pick an image from camera roll"
@@ -251,16 +266,29 @@ const Profile = () => {
           <Text style={styles.btntext}>Log out</Text>
         </Pressable>
         <View style={styles.buttons}>
-          <Pressable style={styles.discardBtn} onPress={() => setDiscard(true)}>
+          {/* <Pressable style={styles.discardBtn} onPress={() => setDiscard(true)}>
             <Text style={styles.discardBtnText}>Discard changes</Text>
-          </Pressable>
-          <Pressable
+          </Pressable> */}
+          <CustomButton
+            title={"Discard changes"}
+            onPressFunction={() => setDiscard(true)}
+            color=""
+            type="outlined"
+          />
+          <CustomButton
+            title={"Save changes"}
+            onPressFunction={() => update(profile)}
+            color="#495e57"
+            type="contained"
+            disabled={!getIsFormValid()}
+          />
+
+          {/* <Pressable
             style={[styles.saveBtn, getIsFormValid() ? "" : styles.btnDisabled]}
             onPress={() => update(profile)}
-            disabled={!getIsFormValid()}
           >
             <Text style={styles.saveBtnText}>Save changes</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

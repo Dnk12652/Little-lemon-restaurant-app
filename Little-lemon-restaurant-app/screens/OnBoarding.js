@@ -19,10 +19,9 @@ import {
 import PagerView from "react-native-pager-view";
 import Constants from "expo-constants";
 import { AuthContext } from "../Context/AuthContext";
-// import { useFonts } from "expo-font";
-// import * as SplashScreen from "expo-splash-screen";
 import { validateEmail, validateName } from "../Utils/CommonFucntions";
 import Hero from "../Utils/HeroSection";
+import CustomButton from "../Utils/CustomButton";
 
 function Onboarding() {
   const [firstName, onChangeFirstName] = useState("");
@@ -98,6 +97,7 @@ function Onboarding() {
             >
               <Text style={styles.btntext}>Next</Text>
             </Pressable>
+           
           </View>
           <View style={styles.page} key="2">
             <View style={styles.pageContainer}>
