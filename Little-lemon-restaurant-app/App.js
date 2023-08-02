@@ -1,61 +1,117 @@
-
-import React,{useEffect,useState} from "react";
-import { StyleSheet, Text, View } from 'react-native';
-import OnboardingScreen from "./screens/OnBoarding";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "./screens/HomeScreen";
-import ProfileScreen from "./screens/ProfileScreen";
+import { useEffect, useMemo, useReducer, useCallback } from "react";
+import { Alert } from "react-native";
+import Onboarding from "./screens/OnBoarding";
+import Profile from "./screens/ProfileScreen";
 import SplashScreen from "./screens/Splash";
+import Home from "./screens/HomeScreen";
+import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "./Context/AuthContext.js";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [isOnboardingCompleted,setOnoardingStatus] = useState(false)
-  useEffect(() => {
-   setIsLoading(true)
-   getData();
- }, []);
- const getData = () => {
-   try {
-     AsyncStorage.getItem("UserData").then((value) => {
-       if (value != null) {
-         console.log("users data",value)
-         setOnoardingStatus(true)
-         setIsLoading(false)
-       }
-     });
-   } catch (error) {
-     console.log(error);
-   }
- };
-  if (isLoading) {
-    return (
-      <SplashScreen/>
-    )
+const reducer = (prevState, action) => {
+  switch (action.type) {
+    case "onboard":
+      return {
+        ...prevState,
+        isLoading: false,
+        isOnboardingCompleted: action.isOnboardingCompleted,
+      };
   }
+};
+const initialState = {
+  isLoading: true,
+  isOnboardingCompleted: false,
+};
+
+export default function App({ navigation }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    (async () => {
+      let profileData = [];
+      try {
+        const getProfile = await AsyncStorage.getItem("profile");
+        if (getProfile !== null) {
+          profileData = getProfile;
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (Object.keys(profileData).length != 0) {
+          dispatch({ type: "onboard", isOnboardingCompleted: true });
+        } else {
+          dispatch({ type: "onboard", isOnboardingCompleted: false });
+        }
+      }
+    })();
+  }, []);
+
+  const authContext = useMemo(
+    () => ({
+      onboard: async (data) => {
+        try {
+          const jsonValue = JSON.stringify(data);
+          await AsyncStorage.setItem("profile", jsonValue);
+        } catch (e) {
+          console.error(e);
+        }
+
+        dispatch({ type: "onboard", isOnboardingCompleted: true });
+      },
+      update: async (data) => {
+        try {
+          const jsonValue = JSON.stringify(data);
+          await AsyncStorage.setItem("profile", jsonValue);
+        } catch (e) {
+          console.error(e);
+        }
+
+        Alert.alert("Success", "Successfully saved changes!");
+      },
+      logout: async () => {
+        try {
+          await AsyncStorage.clear();
+        } catch (e) {
+          console.error(e);
+        }
+
+        dispatch({ type: "onboard", isOnboardingCompleted: false });
+      },
+    }),
+    []
+  );
+
+  if (state.isLoading) {
+    return <SplashScreen />;
+  }
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        {isOnboardingCompleted ? (
-          // Onboarding completed, user is signed in
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-        ) : (
-          // User is NOT signed in
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        )}
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={authContext}>
+      <StatusBar style="dark" />
+      <NavigationContainer>
+        <Stack.Navigator>
+          {state.isOnboardingCompleted ? (
+            <>
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="Profile" component={Profile} />
+            </>
+          ) : (
+            <Stack.Screen
+              name="Onboarding"
+              component={Onboarding}
+              options={{ headerShown: false }}
+            />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    margin:20,
-    backgroundColor: '#fff',
-  },
-});
